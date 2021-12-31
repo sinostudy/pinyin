@@ -15,22 +15,22 @@
   (testing "diacritic"
     (testing "added to characters?"
       (are [x y] (= x y)
-        \a (with-diacritic \a 0)
-        \ā (with-diacritic \a 1)
-        \á (with-diacritic \a 2)
-        \ǎ (with-diacritic \a 3)
-        \à (with-diacritic \a 4)
-        \a (with-diacritic \a 5)
-        \A (with-diacritic \A 0)
-        \Ā (with-diacritic \A 1)
-        \Á (with-diacritic \A 2)
-        \Ǎ (with-diacritic \A 3)
-        \À (with-diacritic \A 4)
-        \A (with-diacritic \A 5)))
+        \a (with-diacritic 0 \a)
+        \ā (with-diacritic 1 \a)
+        \á (with-diacritic 2 \a)
+        \ǎ (with-diacritic 3 \a)
+        \à (with-diacritic 4 \a)
+        \a (with-diacritic 5 \a)
+        \A (with-diacritic 0 \A)
+        \Ā (with-diacritic 1 \A)
+        \Á (with-diacritic 2 \A)
+        \Ǎ (with-diacritic 3 \A)
+        \À (with-diacritic 4 \A)
+        \A (with-diacritic 5 \A)))
     (testing "tone out of range?"
-      (is (thrown? IndexOutOfBoundsException (with-diacritic \a 6))))
+      (is (thrown? IndexOutOfBoundsException (with-diacritic 6 \a))))
     (testing "string instead of char?"
-      (is (nil? (with-diacritic "a" 1))))))
+      (is (nil? (with-diacritic 1 "1"))))))
 
 (deftest test-diacritic-index
   (testing "diacritic-index"
@@ -57,7 +57,7 @@
       (is (= (diacritic-index "lI0") 1))
       (is (= (diacritic-index "Qu4") 1)))
     (testing "undefined cases (returns nil)"
-      (is (thrown? NullPointerException (diacritic-index nil)))
+      (is (nil? (diacritic-index nil)))
       (is (nil? (diacritic-index "")))
       (is (nil? (diacritic-index "4")))
       (is (nil? (diacritic-index [1 2 3])))
