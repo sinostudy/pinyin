@@ -1,9 +1,7 @@
 (ns study.sino.pinyin
   "Functions for converting between different representations of Hànyǔ Pīnyīn.
 
-  Worth noting:
-
-    - The neutral tone is represented as 0 or 5 (or left out) when using digits.
+    - The neutral tone is represented as 0 or 5 (or left out) if using digits.
     - Like in many Pīnyīn input methods, a V is treated as a Ü.
     - The non-standard Pīnyīn M is supported (as found in e.g. cc-cedict).
     - The very common érhuà-style final R is supported as well."
