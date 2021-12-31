@@ -11,7 +11,7 @@
             [study.sino.pinyin.patterns :as patterns]
             [study.sino.pinyin.data :as data]))
 
-(defn parse-int
+(defn- parse-int
   "Parses a string `s` into an integer."
   [s]
   #?(:clj  (Integer/parseInt s)
@@ -109,13 +109,13 @@
 (defn digits->diacritics
   "Convert a Pinyin string `s` with tone digits into one with tone diacritics."
   [s & {:keys [v-as-umlaut?] :or {v-as-umlaut? false}}]
-  (if (not (string? s))
-    s
+  (if (string? s)
     (let [s*                (if v-as-umlaut? (with-umlaut s) s)
           digit-strings     (re-seq #"[^\d]+\d" s*)
           diacritic-strings (map diacritic-string digit-strings)
           suffix            (re-seq #"[^\d]+$" s*)]
-      (apply str (concat diacritic-strings suffix)))))
+      (apply str (concat diacritic-strings suffix)))
+    s))
 
 (defn no-diacritics
   "Remove Pinyin diacritics from the input string `s`."
@@ -132,13 +132,13 @@
   (str/replace s #"[0-9]" ""))
 
 (defn char->tone
-  "Get the tone digit (0-4) based on a `char`, presumably with a diacritic."
-  [char]
-  (when (some? char)
+  "Get the tone digit (0-4) based on a `char-str`, presumably with a diacritic."
+  [char-str]
+  (when (and (string? char-str) (not-empty char-str))
     (loop [tone 1]
       (cond
         (= 5 tone) 0
-        (re-matches (get data/tone-diacritics tone) char) tone
+        (re-matches (get data/tone-diacritics tone) char-str) tone
         :else (recur (inc tone))))))
 
 (defn- replace-at
@@ -184,9 +184,11 @@
 (defn diacritics->digits
   "Convert a Pinyin string `s` with tone diacritics into one with tone digits."
   [s]
-  (let [s*        (no-diacritics s)
-        syllables (re-pos patterns/pinyin-syllable s*)
-        original  #(subs s (first %) (+ (first %) (count (second %))))
-        diacritic #(re-find #"[^\w]" %)
-        tone      (comp #(if (= 0 %) nil %) char->tone diacritic original)]
-    (diacritics->digits* s (map (juxt first second tone) syllables))))
+  (if (string? s)
+    (let [s*        (no-diacritics s)
+          syllables (re-pos patterns/pinyin-syllable s*)
+          original  #(subs s (first %) (+ (first %) (count (second %))))
+          diacritic #(re-find #"[^\w]" %)
+          tone      (comp char->tone diacritic original)]
+      (diacritics->digits* s (map (juxt first second tone) syllables)))
+    s))

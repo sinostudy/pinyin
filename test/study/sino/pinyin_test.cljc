@@ -4,7 +4,11 @@
                                        with-diacritic
                                        diacritic-index
                                        digit->diacritic
-                                       digits->diacritics]]))
+                                       digits->diacritics
+                                       diacritics->digits
+                                       char->tone
+                                       no-digits
+                                       no-diacritics]]))
 
 (deftest test-umlaut
   (testing "umlaut"
@@ -84,3 +88,41 @@
       (is (= (digits->diacritics [1 2 3]) [1 2 3]))
       (is (= (digits->diacritics 0) 0))
       (is (= (digits->diacritics \a) \a)))))
+
+(deftest test-diacritics->digits
+  (testing "diacritics->digits"
+    (testing "converts properly?"
+      (is (= (diacritics->digits "nǐhǎo, nǐ shì shéi?") "ni3hao3, ni3 shi4 shei2?"))
+      (is (= (diacritics->digits "long") "long"))
+      (is (= (diacritics->digits "") "")))
+    (testing "non-strings"
+      (is (= (diacritics->digits []) []))
+      (is (= (diacritics->digits [1 2 3]) [1 2 3]))
+      (is (= (diacritics->digits 0) 0))
+      (is (= (diacritics->digits \a) \a)))))
+
+(deftest test-char->tone
+  (testing "char->tone"
+    (testing "converts properly?"
+      (is (= (char->tone "e") 0))
+      (is (= (char->tone "ā") 1))
+      (is (= (char->tone "é") 2))
+      (is (= (char->tone "ǐ") 3))
+      (is (= (char->tone "ì") 4)))
+    (testing "non-strings"
+      (is (nil? (char->tone "")))
+      (is (nil? (char->tone \a))))))
+
+(deftest test-no-digits
+  (testing "no-digits"
+    (testing "converts properly?"
+      (is (= (no-digits "ni3hao3, ni3 shi4 shei2?") "nihao, ni shi shei?")))
+    (testing "non-strings"
+      (is (= (no-digits \a) "a")))))
+
+(deftest test-no-diacritics
+  (testing "no-diacritics"
+    (testing "converts properly?"
+      (is (= (no-diacritics "nǐhǎo, nǐ shì shéi?") "nihao, ni shi shei?")))
+    (testing "non-strings"
+      (is (= (no-diacritics \a) "a")))))
